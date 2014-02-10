@@ -155,10 +155,12 @@ public class ZeissCZIReader extends FormatReader {
 
   /** Constructs a new Zeiss .czi reader. */
   public ZeissCZIReader() {
+      
     super("Zeiss CZI", "czi");
     domains = new String[] {FormatTools.LM_DOMAIN};
     suffixSufficient = true;
     suffixNecessary = false;
+System.out.println("We are opening a new CZI Reader object!!");
   }
 
   // -- IFormatReader API methods --
@@ -167,6 +169,7 @@ public class ZeissCZIReader extends FormatReader {
    * @see loci.formats.IFormatReader#isThisType(RandomAccessInputStream)
    */
   public boolean isThisType(RandomAccessInputStream stream) throws IOException {
+      System.out.println("isThisType");
     final int blockLen = 10;
     if (!FormatTools.validStream(stream, blockLen, true)) return false;
     String check = stream.readString(blockLen);
@@ -177,6 +180,7 @@ public class ZeissCZIReader extends FormatReader {
    * @see loci.formats.IFormatReader#getSeriesUsedFiles(boolean)
    */
   public String[] getSeriesUsedFiles(boolean noPixels) {
+      System.out.println("getSeriesUsedFiles");
     FormatTools.assertId(currentId, true, 1);
     if (pixels.size() == 0 && noPixels) {
       return null;
@@ -196,6 +200,7 @@ public class ZeissCZIReader extends FormatReader {
 
   /* @see loci.formats.IFormatReader#get8BitLookupTable() */
   public byte[][] get8BitLookupTable() throws FormatException, IOException {
+      System.out.println("get8BitLookupTable");
     if ((getPixelType() != FormatTools.INT8 &&
       getPixelType() != FormatTools.UINT8) || previousChannel == -1 ||
       previousChannel >= channels.size())
@@ -232,6 +237,7 @@ public class ZeissCZIReader extends FormatReader {
 
   /* @see loci.formats.IFormatReader#get16BitLookupTable() */
   public short[][] get16BitLookupTable() throws FormatException, IOException {
+System.out.println("get16BitLookupTable");
     if ((getPixelType() != FormatTools.INT16 &&
       getPixelType() != FormatTools.UINT16) || previousChannel == -1 ||
       previousChannel >= channels.size())
@@ -276,6 +282,7 @@ public class ZeissCZIReader extends FormatReader {
   public byte[] openBytes(int no, byte[] buf, int x, int y, int w, int h)
     throws FormatException, IOException
   {
+System.out.println("openBytes");
     FormatTools.checkPlaneParameters(this, no, buf.length, x, y, w, h);
 
     previousChannel = getZCTCoords(no)[1];
@@ -368,6 +375,7 @@ public class ZeissCZIReader extends FormatReader {
 
   /* @see loci.formats.IFormatReader#close(boolean) */
   public void close(boolean fileOnly) throws IOException {
+System.out.println("close");
     super.close(fileOnly);
     if (!fileOnly) {
       pixels = null;
@@ -426,6 +434,7 @@ public class ZeissCZIReader extends FormatReader {
   /* @see loci.formats.FormatReader#initFile(String) */
   protected void initFile(String id) throws FormatException, IOException {
     super.initFile(id);
+    System.out.println("initFile");
     CoreMetadata ms0 = core.get(0);
 
     ms0.littleEndian = true;
@@ -829,6 +838,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private void calculateDimensions() {
+      System.out.println("calculateDimensions");
     // calculate the dimensions
     CoreMetadata ms0 = core.get(0);
 
@@ -922,6 +932,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private void assignPlaneIndices() {
+System.out.println("assignPlaneIndices");
     // assign plane and series indices to each SubBlock
 
     if (getSeriesCount() == mosaics) {
@@ -1021,6 +1032,7 @@ public class ZeissCZIReader extends FormatReader {
 
   private void translateMetadata(String xml) throws FormatException, IOException
   {
+      System.out.println("translateMetadata");
     Element root = null;
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -1050,18 +1062,19 @@ public class ZeissCZIReader extends FormatReader {
       }
     }
 
-    translateExperiment(realRoot);
-    translateInformation(realRoot);
+    //translateExperiment(realRoot);
+    //translateInformation(realRoot);
     translateScaling(realRoot);
     translateDisplaySettings(realRoot);
     translateLayers(realRoot);
-    translateHardwareSettings(realRoot);
+    //translateHardwareSettings(realRoot);
 
     Stack<String> nameStack = new Stack<String>();
     populateOriginalMetadata(realRoot, nameStack);
   }
 
   private void translateInformation(Element root) throws FormatException {
+      System.out.println("translateInformation");
     NodeList informations = root.getElementsByTagName("Information");
     if (informations == null || informations.getLength() == 0) {
       return;
@@ -1306,7 +1319,7 @@ public class ZeissCZIReader extends FormatReader {
       }
 
       NodeList objectives = getGrandchildren(instrument, "Objective");
-      parseObjectives(objectives);
+      //parseObjectives(objectives);
 
       NodeList filterSets = getGrandchildren(instrument, "FilterSet");
       if (filterSets != null) {
@@ -1458,6 +1471,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private void translateScaling(Element root) {
+      System.out.println("translateScaling");
     NodeList scalings = root.getElementsByTagName("Scaling");
     if (scalings == null || scalings.getLength() == 0) {
       return;
@@ -1503,6 +1517,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private void translateDisplaySettings(Element root) throws FormatException {
+      System.out.println("translateDisplaySettings");
     NodeList displaySettings = root.getElementsByTagName("DisplaySetting");
     if (displaySettings == null || displaySettings.getLength() == 0) {
       return;
@@ -1552,6 +1567,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private void translateLayers(Element root) {
+      System.out.println("translateLayers");
     NodeList layerses = root.getElementsByTagName("Layers");
     if (layerses == null || layerses.getLength() == 0) {
       return;
@@ -1726,6 +1742,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private void translateHardwareSettings(Element root) throws FormatException {
+      System.out.println("translateHardwareSettings");
     NodeList hardwareSettings = root.getElementsByTagName("HardwareSetting");
     if (hardwareSettings == null || hardwareSettings.getLength() == 0) {
       return;
@@ -1812,6 +1829,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private int populateRectangles(NodeList rectangles, int roi, int shape) {
+      System.out.println("populateRectangles");
     for (int s=0; s<rectangles.getLength(); s++) {
       Element rectangle = (Element) rectangles.item(s);
 
@@ -1848,6 +1866,7 @@ public class ZeissCZIReader extends FormatReader {
   private int populatePolylines(NodeList polylines, int roi, int shape,
     boolean closed)
   {
+      System.out.println("populatePolylines");
     for (int s=0; s<polylines.getLength(); s++, shape++) {
       Element polyline = (Element) polylines.item(s);
       Element geometry = getFirstNode(polyline, "Geometry");
@@ -1875,6 +1894,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private int populateLines(NodeList lines, int roi, int shape) {
+      System.out.println("populateLines");
    for (int s=0; s<lines.getLength(); s++, shape++) {
       Element line = (Element) lines.item(s);
 
@@ -1908,6 +1928,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private int populateCircles(NodeList circles, int roi, int shape) {
+      System.out.println("populateCircles");
     for (int s=0; s<circles.getLength(); s++, shape++) {
       Element circle = (Element) circles.item(s);
       Element geometry = getFirstNode(circle, "Geometry");
@@ -1936,6 +1957,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private void translateExperiment(Element root) throws FormatException {
+      System.out.println("translateExperiment");
     NodeList experiments = root.getElementsByTagName("Experiment");
     if (experiments == null || experiments.getLength() == 0) {
       return;
@@ -2096,6 +2118,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private void populateOriginalMetadata(Element root, Stack<String> nameStack) {
+      System.out.println("populateOriginalMetadata");
     String name = root.getNodeName();
     nameStack.push(name);
 
@@ -2147,6 +2170,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private Segment readSegment(String filename) throws IOException {
+      System.out.println("readSegment");
     // align the stream to a multiple of 32 bytes
     int skip =
       (ALIGNMENT - (int) (in.getFilePointer() % ALIGNMENT)) % ALIGNMENT;
@@ -2199,6 +2223,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private void convertPixelType(int pixelType) throws FormatException {
+      System.out.println("convertPixelType");
     CoreMetadata ms0 = core.get(0);
     switch (pixelType) {
       case GRAY8:
@@ -2245,6 +2270,7 @@ public class ZeissCZIReader extends FormatReader {
   }
 
   private void parseObjectives(NodeList objectives) throws FormatException {
+System.out.println("parseObjectives");
     if (objectives != null) {
       for (int i=0; i<objectives.getLength(); i++) {
         Element objective = (Element) objectives.item(i);
